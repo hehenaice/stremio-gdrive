@@ -1,5 +1,6 @@
 import os
 import requests
+from json import JSONDecodeError
 from flask import Flask, jsonify, abort
 from utils import gdrive, MetadataNotFound
 
@@ -45,6 +46,12 @@ def addon_stream(type, id):
         return respond_with({'streams': gd.get_streams(type, id)})
     except MetadataNotFound as e:
         print(f'ERROR: {e}')
+        abort(404)
+    except JSONDecodeError as e:
+        if id[:5] == 'kitsu':
+            print(f'ERROR: Cloudflare anime kitsu 1020\n{e}')
+        else:
+            print(f'JSONDecodeError: Failed to fetch meta for {type} {id}\n{e}')
         abort(404)
 
 
